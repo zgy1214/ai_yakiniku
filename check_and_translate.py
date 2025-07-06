@@ -11,5 +11,5 @@ if __name__ == '__main__':
 
     corrected_srt_object = check(srt_obj, bangumi_name)
 
-    final_srt_object = translate_bilingual(corrected_srt_object, bangumi_name)
+    final_srt_object = translate_bilingual(corrected_srt_object, bangumi_name,language='jp')
     ass_doc = srt_to_ass(final_srt_object, './output/output.ass')

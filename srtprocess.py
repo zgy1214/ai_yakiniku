@@ -91,7 +91,6 @@ def srt_to_ass(srt_obj, output_path="output.ass"):
     header = """[Script Info]
 ScriptType: v4.00+
 Collisions: Normal
-Timer: 100.0000
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, 

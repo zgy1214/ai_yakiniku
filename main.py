@@ -55,6 +55,8 @@ try:
 except Exception as e:
     print('没有节目信息')
 
+print(f"导出语言：{language}")
+
 # 配置中间文件路径
 pipeline_dir = './pipeline'
 vocal_wav = "./pipeline/vocals.wav"
