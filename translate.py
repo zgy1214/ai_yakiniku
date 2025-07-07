@@ -5,6 +5,7 @@ import pysrt
 
 from llm import client_2
 from prompts.prompt_zh import get_prompt_zh
+from srtprocess import ass_to_pysrt, srt_to_ass
 
 
 def parse_translated_text_to_srt(translated_text, original_chunk):
@@ -30,7 +31,7 @@ def srt_chunk_to_text(subs):
     )
 
 
-def translate_bilingual(srt_obj, bangumi_name, language = 'bi'):
+def translate_bilingual(srt_obj, bangumi_name, language='bi'):
     if language == 'jp':
         return srt_obj  # 无需翻译
     translated = []
@@ -77,10 +78,9 @@ def translate_bilingual(srt_obj, bangumi_name, language = 'bi'):
 
 
 if __name__ == '__main__':
-    srt_path = './pipeline/jap_raw.srt'
-    srt_obj = pysrt.open(srt_path, encoding='utf-8')
+    srt_obj = ass_to_pysrt('test_output.ass')
 
-    bangumi_name = "yakouseijiron"
+    bangumi_name = "snb"
     translated_srt = translate_bilingual(srt_obj, bangumi_name)
 
-    translated_srt.save('translated_example.srt', encoding='utf-8')
+    srt_to_ass(translated_srt,'#1.ass')

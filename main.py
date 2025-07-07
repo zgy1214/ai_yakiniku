@@ -7,6 +7,7 @@ import whisper
 
 from check import check
 from cut import slice_audio
+from detect_and_fill_missing import detect_and_fill_missing_subs
 from separate import separate_audio
 from srtprocess import whisper_result_to_srt, save_srt_to_file, merge_srt_list, srt_to_ass
 from transcribe import transcribe
@@ -87,8 +88,7 @@ for i in range(slice_cnt):
     print(f"开始转录第 {i + 1} / {slice_cnt} 个片段")
     slice_file = pipeline_dir + f'/vocals_part{i + 1:03}.wav'
 
-    whisper_result = transcribe(audio_file=slice_file, model=model)
-    srt_obj = whisper_result_to_srt(whisper_result)
+    srt_obj = transcribe(audio_file=slice_file, model=model)
     srt_obj.save(f'/vocals_part{i + 1:03}.srt')
     srt_objs.append(srt_obj)
 
@@ -98,6 +98,9 @@ for index, sub_item in enumerate(srt_objs):
     offset_list.append(offset_seconds)
 
 merged_srt_object = merge_srt_list(srt_objs, offset_list)
+
+# 检测是否有遗漏的部分
+merged_srt_object = detect_and_fill_missing_subs(merged_srt_object,'./pipeline/vocal.wav',model)
 save_srt_to_file(merged_srt_object, output_japsrt_raw)  # 存档保存
 
 corrected_srt_object = check(merged_srt_object, bangumi_name)

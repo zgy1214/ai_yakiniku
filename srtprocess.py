@@ -1,6 +1,10 @@
 import copy
+import datetime
+import os
 import pysrt
 from datetime import timedelta
+from pydub import AudioSegment
+import pysubs2
 
 def merge_srt_list(srt_list, offset_seconds_list=None):
     """
@@ -96,6 +100,7 @@ Collisions: Normal
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, 
 StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
 Style: Default,微软雅黑,60,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,0,2,10,10,10,1
+Style: 顶部,微软雅黑,55,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,2,2,8,10,10,10,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -116,7 +121,56 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     print(f"ASS字幕文件已生成：{output_path}")
 
 
+
+def ass_to_pysrt(ass_path: str) -> pysrt.SubRipFile:
+    """
+    更高精度地将 .ass 文件转换为 pysrt.SubRipFile
+    """
+    srt_subs = pysrt.SubRipFile()
+
+    with open(ass_path, 'r', encoding='utf-8') as f:
+        in_events = False
+        for line in f:
+            line = line.strip()
+            if line.startswith('[Events]'):
+                in_events = True
+                continue
+            if not in_events:
+                continue
+            if line.startswith('Dialogue:'):
+                # Dialogue: Marked=0,0:00:07.15,0:00:09.22,Default,,0,0,0,,文本内容
+                parts = line.split(',', 9)
+                if len(parts) < 10:
+                    continue
+                start_str = parts[1].strip()
+                end_str = parts[2].strip()
+                text = parts[9].replace(r'\N', '\n').strip()
+
+                start = parse_ass_time(start_str)
+                end = parse_ass_time(end_str)
+                index = len(srt_subs) + 1
+                srt_subs.append(pysrt.SubRipItem(index=index, start=start, end=end, text=text))
+
+    return srt_subs
+
+def parse_ass_time(ass_time: str) -> pysrt.SubRipTime:
+    """
+    将 ASS 时间格式（如 0:01:23.45）转换为 pysrt.SubRipTime（精确到毫秒）
+    """
+    h, m, rest = ass_time.strip().split(':')
+    s, cs = rest.split('.')
+    hours = int(h)
+    minutes = int(m)
+    seconds = int(s)
+    centiseconds = int(cs)  # ASS 是百分之一秒
+    milliseconds = centiseconds * 10
+    return pysrt.SubRipTime(hours, minutes, seconds, milliseconds)
+
 if __name__ == '__main__':
-    srt = pysrt.open('test.srt', encoding='utf-8')
-    srt_to_ass(srt, 'test_output.ass')
+    ass_obj = pysubs2.load('snb.ass')  # 自动识别 .ass 格式
+    pysrt_obj = ass_to_pysrt(ass_obj)
+    srt_to_ass(pysrt_obj, 'test_output.ass')
+
+
+
 
