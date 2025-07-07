@@ -45,7 +45,7 @@ def translate_bilingual(srt_obj, bangumi_name, language='bi'):
 
         # 调用翻译模型
         response = client_2.chat.completions.create(
-            model='gpt-4o-mini',
+            model='gpt-4o',
             messages=[
                 {'role': 'system', 'content': get_prompt_zh(bangumi_name)},
                 {'role': 'user', 'content': f"以下是字幕内容，请将每句翻译为中文，对应保留原句：\n\n{content}"}
