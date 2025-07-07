@@ -1,8 +1,6 @@
 import time
-
-import torch
-import whisper
-from pydub import AudioSegment
+#import nemo.collections.asr as nemo_asr
+from llm import client_2
 from srtprocess import whisper_result_to_srt, save_srt_to_file
 
 result_container = {}
@@ -39,3 +37,12 @@ def transcribe(model,audio_file):
     transcribe_time = time.time() - transcribe_start
     print(f"\n转录完成，耗时: {transcribe_time:.2f}秒")
     return result_container.get('result', None)
+
+if __name__ == '__main__':
+    asr_model = nemo_asr.models.ASRModel.from_pretrained("reazon-research/reazonspeech-nemo-v2")
+    transcriptions = asr_model.transcribe(["output_audio.wav"], return_hypotheses=True)
+    # 打印结果
+    print("Transcription:", transcriptions[0].text)
+    # 保存到文件
+    with open("output_audio.txt", "w", encoding="utf-8") as f:
+        f.write(transcriptions[0].text + "\n")

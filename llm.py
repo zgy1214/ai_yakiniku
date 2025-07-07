@@ -201,9 +201,10 @@ client_2 =openai.OpenAI(
     base_url="https://api.chatanywhere.tech/v1",
     api_key='sk-6vzl1Y1gibziRH5PsqVhTFsnMQPE2PvKIepKlK7vtnEKGuUv',  # ModelScope Token
 )
+#来自https://github.com/chatanywhere/GPT_API_free
 if __name__ == '__main__':
     response = client_2.chat.completions.create(
-        model='gpt-4o-mini-ca', # ModelScope Model-Id
+        model='gpt-4o', # ModelScope Model-Id
         messages=[
             {
                 'role': 'system',
