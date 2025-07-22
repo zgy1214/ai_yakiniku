@@ -6,7 +6,7 @@ import pysubs2
 import whisper
 from pydub import AudioSegment
 
-from srtprocess import ass_to_pysrt, srt_to_ass
+from srtprocess import ass_to_pysrt, srt_to_ass, save_srt_to_file
 from transcribe import transcribe
 
 
@@ -63,6 +63,7 @@ def detect_and_fill_missing_subs(subs: pysrt.SubRipFile, audio_file: str, model 
 
 if __name__ == '__main__':
     model = whisper.load_model('./models/whisper/large-v2.pt', device='cuda') # 自动识别 .ass 格式
-    pysrt_obj = ass_to_pysrt('snb.ass')
+    pysrt_obj = pysrt.open('./pipeline/jp_raw.srt')
     pysrt_obj = detect_and_fill_missing_subs(pysrt_obj,'./pipeline/vocals.wav',model)
-    srt_to_ass(pysrt_obj, 'test_output.ass')
+    save_srt_to_file(pysrt_obj,'./pipeline/jp_raw.srt')
+    #srt_to_ass(pysrt_obj, 'test_output.ass')

@@ -1,6 +1,7 @@
 import argparse
 import time
 
+import pysrt
 import requests
 import torch
 import whisper
@@ -61,7 +62,7 @@ print(f"导出语言：{language}")
 # 配置中间文件路径
 pipeline_dir = './pipeline'
 vocal_wav = "./pipeline/vocals.wav"
-output_japsrt_raw = "./pipeline/jap_raw.srt"
+output_jpsrt_raw_path = "./pipeline/jp_raw.srt"
 
 # 指定本地模型路径
 model_path = f"models/whisper/{model}.pt"
@@ -89,7 +90,7 @@ for i in range(slice_cnt):
     slice_file = pipeline_dir + f'/vocals_part{i + 1:03}.wav'
 
     srt_obj = transcribe(audio_file=slice_file, model=model)
-    srt_obj.save(f'/vocals_part{i + 1:03}.srt')
+    srt_obj.save(f'./pipeline/vocals_part{i + 1:03}.srt')
     srt_objs.append(srt_obj)
 
 offset_list = []
@@ -98,10 +99,11 @@ for index, sub_item in enumerate(srt_objs):
     offset_list.append(offset_seconds)
 
 merged_srt_object = merge_srt_list(srt_objs, offset_list)
-
+save_srt_to_file(merged_srt_object, output_jpsrt_raw_path)
 # 检测是否有遗漏的部分
-merged_srt_object = detect_and_fill_missing_subs(merged_srt_object,'./pipeline/vocal.wav',model)
-save_srt_to_file(merged_srt_object, output_japsrt_raw)  # 存档保存
+merged_srt_object = pysrt.open('./pipeline/jp_raw.srt')
+merged_srt_object = detect_and_fill_missing_subs(merged_srt_object, './pipeline/vocals.wav', model)
+save_srt_to_file(merged_srt_object, output_jpsrt_raw_path)  # 存档保存
 
 corrected_srt_object = check(merged_srt_object, bangumi_name)
 final_srt_object = translate_bilingual(corrected_srt_object, bangumi_name, language=language)

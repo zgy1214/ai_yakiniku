@@ -45,7 +45,7 @@ def translate_bilingual(srt_obj, bangumi_name, language='bi'):
 
         # 调用翻译模型
         response = client_2.chat.completions.create(
-            model='gpt-4o',
+            model='gpt-4o-mini',
             messages=[
                 {'role': 'system', 'content': get_prompt_zh(bangumi_name)},
                 {'role': 'user', 'content': f"以下是字幕内容，请将每句翻译为中文，对应保留原句：\n\n{content}"}
@@ -58,19 +58,31 @@ def translate_bilingual(srt_obj, bangumi_name, language='bi'):
         result_text = response.choices[0].message.content
         translated_chunk = parse_translated_text_to_srt(result_text, chunk)
 
-        for orig, trans in zip(chunk_cpy, translated_chunk):
+        for i, orig in enumerate(chunk_cpy):
             # 构建新字幕条目
             if language == 'bi':
                 # 构建双语字幕
+                trans_text = translated_chunk[i].text.strip() if i < len(translated_chunk) else ""
                 new_sub = pysrt.SubRipItem(
                     index=orig.index,
                     start=orig.start,
                     end=orig.end,
-                    text=f"{trans.text.strip()}\n{orig.text.strip()}"  # 中文在上，日文在下
+                    text=f"{trans_text}\n{orig.text.strip()}" if trans_text else orig.text.strip()
                 )
                 translated.append(new_sub)
             else:
-                translated.append(trans)
+                # 单语模式
+                if i < len(translated_chunk):
+                    translated.append(translated_chunk[i])
+                else:
+                    # 保留原时间轴但内容为空
+                    empty_sub = pysrt.SubRipItem(
+                        index=orig.index,
+                        start=orig.start,
+                        end=orig.end,
+                        text=""
+                    )
+                    translated.append(empty_sub)
 
         time.sleep(1)
 
