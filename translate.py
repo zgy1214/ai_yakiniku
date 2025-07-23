@@ -35,7 +35,7 @@ def translate_bilingual(srt_obj, bangumi_name, language='bi'):
     if language == 'jp':
         return srt_obj  # 无需翻译
     translated = []
-    chunk_size = 60
+    chunk_size = 50
 
     for i in range(0, len(srt_obj), chunk_size):
         chunk = srt_obj[i:i + chunk_size]

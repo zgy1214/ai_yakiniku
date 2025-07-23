@@ -30,7 +30,7 @@ def srt_chunk_to_text(subs):
 def check(srt_obj,bangumi_name):
     corrected = []
 
-    chunk_size = 60
+    chunk_size = 50
     for i in range(0, len(srt_obj), chunk_size):
         chunk = srt_obj[i:i + chunk_size]
         content = srt_chunk_to_text(chunk)
